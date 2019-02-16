@@ -1,0 +1,38 @@
+<html>
+<body>
+  
+<div id="divUI">
+	<h1>JavaScript Modularizer</h1>
+	<p>Specify an .html file to modularize or a .tar file to demodularize.</p>
+	<label>File:</label>
+	<input id="inputFileToLoad" type="file" onchange="inputFileToLoad_OnChange()"></input>
+</div>
+
+<script type="text/javascript">
+
+	// user interface events
+
+	function inputFileToLoad_OnChange()
+	{
+		var inputFileToLoad = document.getElementById("inputFileToLoad");
+		var fileToLoad = inputFileToLoad.files[0];
+		new Modularizer().processFile(fileToLoad);
+	}
+
+</script>
+
+<script type="text/javascript" src="StringExtensions.js"></script>
+
+<script type="text/javascript" src="ByteHelper.js"></script>
+<script type="text/javascript" src="ByteStream.js"></script>
+<script type="text/javascript" src="Modularizer.js"></script>
+<script type="text/javascript" src="FileWrapper.js"></script>
+<script type="text/javascript" src="FileHelper.js"></script>
+<script type="text/javascript" src="TarFile.js"></script>
+<script type="text/javascript" src="TarFileEntry.js"></script>
+<script type="text/javascript" src="TarFileEntryHeader.js"></script>
+<script type="text/javascript" src="TarFileTypeFlag.js"></script>
+
+</body>
+</html>
+
