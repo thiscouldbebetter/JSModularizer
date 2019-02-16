@@ -13,7 +13,6 @@ function Modularizer()
 	Modularizer.TokenForScriptTagOpen = "<script";
 	Modularizer.TokenForScriptTagClose = "</script";
 
-
 	// methods
 
 	Modularizer.prototype.processFile = function(file)
@@ -58,26 +57,32 @@ function Modularizer()
 		var bytesForAllEntriesSoFar = [];
 	
 		var tarFileEntries = tarFile.entries;
+		tarFileEntries = tarFileEntries.filter
+		(
+			function(x) {  return (x.isDirectory() == false && x.header.fileName.endsWith(".js")); }
+		);
+		tarFileEntries = tarFileEntries.sort
+		(
+			function(x, y) { return (x.header.fileName <= y.header.fileName ? -1 : 1); }
+		);
+
 		for (var i = 0; i < tarFileEntries.length; i++)
 		{
 			var entry = tarFileEntries[i];
-			if (entry.isDirectory() == false)
-			{
-				var entryName = entry.header.fileName;
-				var entryDataAsBytes = entry.dataAsBytes;
-
-				bytesForAllEntriesSoFar = 
-					bytesForAllEntriesSoFar.concat(entryDataAsBytes);
-			}
+			var entryDataAsBytes = entry.dataAsBytes;
+			bytesForAllEntriesSoFar =
+				bytesForAllEntriesSoFar.concat(entryDataAsBytes);
 		}
 
-		var bytesAsString = "";
+		var bytesAsString = "<html><body><script type='text/javascript'>\n\n";
 		for (var i = 0; i < bytesForAllEntriesSoFar.length; i++)
 		{
 			var byteToConvert = bytesForAllEntriesSoFar[i];
 			var byteAsChar = String.fromCharCode(byteToConvert);
 			bytesAsString += byteAsChar;
 		}
+		bytesAsString += "\n\nmain();\n\n";
+		bytesAsString += "</script></body></html>";
 
 		FileHelper.saveTextAsFile
 		(
