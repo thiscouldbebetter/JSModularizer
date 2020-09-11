@@ -1,53 +1,50 @@
 
-function TarFileEntry(header, dataAsBytes)
+class TarFileEntry
 {
-	this.header = header;
-	this.dataAsBytes = dataAsBytes;
-}
+	constructor(header, dataAsBytes)
+	{
+		this.header = header;
+		this.dataAsBytes = dataAsBytes;
+	}
 
-{
-	// methods
-	
 	// static methods
-	
-	TarFileEntry.directoryNew = function(directoryName)
+
+	static directoryNew(directoryName)
 	{
 		var header = new TarFileEntryHeader.directoryNew(directoryName);
-		
 		var entry = new TarFileEntry(header, []);
-		
 		return entry;
 	}
-	
-	TarFileEntry.fileNew = function(fileName, fileContentsAsBytes)
+
+	static fileNew(fileName, fileContentsAsBytes)
 	{
-		var header = new TarFileEntryHeader.fileNew(fileName, fileContentsAsBytes);
-		
+		var header = TarFileEntryHeader.fileNew(fileName, fileContentsAsBytes);
+
 		var entry = new TarFileEntry(header, fileContentsAsBytes);
-		
+
 		return entry;
 	}
-	
-	TarFileEntry.fromBytes = function(chunkAsBytes, reader)
+
+	static fromBytes(chunkAsBytes, reader)
 	{
-		var chunkSize = TarFile.ChunkSize;
-	
+		var chunkSize = TarFile.ChunkSize();
+
 		var header = TarFileEntryHeader.fromBytes
 		(
 			chunkAsBytes
 		);
-	
+
 		var sizeOfDataEntryInBytesUnpadded = header.fileSizeInBytes;	
 
 		var numberOfChunksOccupiedByDataEntry = Math.ceil
 		(
 			sizeOfDataEntryInBytesUnpadded / chunkSize
 		)
-	
+
 		var sizeOfDataEntryInBytesPadded = 
 			numberOfChunksOccupiedByDataEntry
 			* chunkSize;
-	
+
 		var dataAsBytes = reader.readBytes
 		(
 			sizeOfDataEntryInBytesPadded
@@ -55,37 +52,37 @@ function TarFileEntry(header, dataAsBytes)
 		(
 			0, sizeOfDataEntryInBytesUnpadded
 		);
-	
+
 		var entry = new TarFileEntry(header, dataAsBytes);
-		
+
 		return entry;
 	}
-	
-	TarFileEntry.manyFromByteArrays = function
+
+	static manyFromByteArrays
 	(
 		fileNamePrefix, fileNameSuffix, entriesAsByteArrays
 	)
 	{
 		var returnValues = [];
-		
+
 		for (var i = 0; i < entriesAsByteArrays.length; i++)
 		{
 			var entryAsBytes = entriesAsByteArrays[i];
 			var entry = TarFileEntry.fileNew
-			(		
+			(
 				fileNamePrefix + i + fileNameSuffix,
 				entryAsBytes
 			);
-			
+
 			returnValues.push(entry);
 		}
-		
+
 		return returnValues;
 	}
-	
+
 	// instance methods
 
-	TarFileEntry.prototype.download = function(event)
+	download(event)
 	{
 		FileHelper.saveBytesAsFile
 		(
@@ -94,52 +91,52 @@ function TarFileEntry(header, dataAsBytes)
 		);
 	}
 
-	TarFileEntry.prototype.isDirectory = function()
+	isDirectory()
 	{
 		return (this.header.typeFlag == TarFileTypeFlag.Instances.Directory);
 	}
-	
-	TarFileEntry.prototype.remove = function(event)
+
+	remove(event)
 	{
 		alert("Not yet implemented!"); // todo
 	}
-	
-	TarFileEntry.prototype.toBytes = function()
+
+	toBytes()
 	{
 		var entryAsBytes = [];
-	
-		var chunkSize = TarFile.ChunkSize;
-	
+
+		var chunkSize = TarFile.ChunkSize();
+
 		var headerAsBytes = this.header.toBytes();
 		entryAsBytes = entryAsBytes.concat(headerAsBytes);
 		
 		entryAsBytes = entryAsBytes.concat(this.dataAsBytes);
 
-		var sizeOfDataEntryInBytesUnpadded = this.header.fileSizeInBytes;	
+		var sizeOfDataEntryInBytesUnpadded = this.header.fileSizeInBytes;
 
 		var numberOfChunksOccupiedByDataEntry = Math.ceil
 		(
 			sizeOfDataEntryInBytesUnpadded / chunkSize
 		)
-	
+
 		var sizeOfDataEntryInBytesPadded = 
 			numberOfChunksOccupiedByDataEntry
 			* chunkSize;
-			
+
 		var numberOfBytesOfPadding = 
 			sizeOfDataEntryInBytesPadded - sizeOfDataEntryInBytesUnpadded;
-	
+
 		for (var i = 0; i < numberOfBytesOfPadding; i++)
 		{
 			entryAsBytes.push(0);
 		}
-		
+
 		return entryAsBytes;
-	}	
-		
+	}
+
 	// strings
-	
-	TarFileEntry.prototype.toString = function()
+
+	toString()
 	{
 		var newline = "\n";
 
@@ -161,5 +158,5 @@ function TarFileEntry(header, dataAsBytes)
 
 		return returnValue
 	}
-	
+
 }

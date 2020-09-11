@@ -1,7 +1,10 @@
 
-function FileWrapper(name, isTextRatherThanBinary, contents)
+class FileWrapper
 {
-	this.name = name;
-	this.isTextRatherThanBinary = isTextRatherThanBinary;
-	this.contents = contents;
+	constructor(name, isTextRatherThanBinary, contents)
+	{
+		this.name = name;
+		this.isTextRatherThanBinary = isTextRatherThanBinary;
+		this.contents = contents;
+	}
 }

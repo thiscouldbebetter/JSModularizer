@@ -1,11 +1,10 @@
 
-function FileHelper()
-{}
+class FileHelper
 {
-	FileHelper.loadFileAsBinaryString = function(fileToLoad, contextForCallback, callback)
-	{	
+	static loadFileAsBinaryString(fileToLoad, contextForCallback, callback)
+	{
 		var fileReader = new FileReader();
-		fileReader.onloadend = function(fileLoadedEvent)
+		fileReader.onloadend = (fileLoadedEvent) =>
 		{
 			var returnValue = null;
 
@@ -25,7 +24,7 @@ function FileHelper()
 		fileReader.readAsBinaryString(fileToLoad);
 	}
 
-	FileHelper.saveBytesAsFile = function(bytesToWrite, fileNameToSaveAs)
+	static saveBytesAsFile(bytesToWrite, fileNameToSaveAs)
 	{
 		var bytesToWriteAsArrayBuffer = new ArrayBuffer(bytesToWrite.length);
 		var bytesToWriteAsUIntArray = new Uint8Array(bytesToWriteAsArrayBuffer);
@@ -46,11 +45,11 @@ function FileHelper()
 		downloadLink.href = window.URL.createObjectURL(bytesToWriteAsBlob);
 		downloadLink.onclick = FileHelper.destroyClickedElement;
 		downloadLink.style.display = "none";
-		document.body.appendChild(downloadLink);	
+		document.body.appendChild(downloadLink);
 		downloadLink.click();
 	}
 
-	FileHelper.saveTextAsFile = function(textToSave, fileNameToSaveTo)
+	static saveTextAsFile(textToSave, fileNameToSaveTo)
 	{
 		var textToSaveAsBlob = new Blob([textToSave], {type:"text/plain"});
 		var textToSaveAsURL = window.URL.createObjectURL(textToSaveAsBlob);
@@ -59,7 +58,7 @@ function FileHelper()
 		downloadLink.download = fileNameToSaveTo;
 		downloadLink.innerHTML = "Download File";
 		downloadLink.href = textToSaveAsURL;
-		downloadLink.onclick = function(event) 
+		downloadLink.onclick = (event) =>
 		{ 
 			document.body.removeChild(event.target); 
 		}

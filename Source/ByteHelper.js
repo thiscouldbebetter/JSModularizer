@@ -1,13 +1,6 @@
-
-// classes
-
-function ByteHelper()
+class ByteHelper
 {
-	// static class
-}
-
-{
-	ByteHelper.stringToBytes = function(stringToConvert)
+	static stringToBytes(stringToConvert)
 	{
 		var returnValues = [];
 

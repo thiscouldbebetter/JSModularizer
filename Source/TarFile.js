@@ -1,24 +1,25 @@
 
-function TarFile(fileName, entries)
+class TarFile
 {
-	this.fileName = fileName;
-	this.entries = entries;
-}
+	constructor(fileName, entries)
+	{
+		this.fileName = fileName;
+		this.entries = entries;
+	}
 
-{
 	// constants
 
-	TarFile.ChunkSize = 512;
+	static ChunkSize() { return 512 };
 
 	// static methods
 
-	TarFile.fromBytes = function(fileName, bytes)
+	static fromBytes(fileName, bytes)
 	{
 		var reader = new ByteStream(bytes);
 
 		var entries = [];
 
-		var chunkSize = TarFile.ChunkSize;
+		var chunkSize = TarFile.ChunkSize();
 
 		var numberOfConsecutiveZeroChunks = 0;
 
@@ -64,8 +65,8 @@ function TarFile(fileName, entries)
 
 		return returnValue;
 	}
-	
-	TarFile.new = function(fileName)
+
+	static create(fileName)
 	{
 		return new TarFile
 		(
@@ -75,17 +76,17 @@ function TarFile(fileName, entries)
 	}
 
 	// instance methods
-	
-	TarFile.prototype.downloadAs = function(fileNameToSaveAs)
-	{	
+
+	downloadAs(fileNameToSaveAs)
+	{
 		FileHelper.saveBytesAsFile
 		(
 			this.toBytes(),
 			fileNameToSaveAs
 		)
-	}	
-	
-	TarFile.prototype.entriesForDirectories = function()
+	}
+
+	entriesForDirectories()
 	{
 		var returnValues = [];
 		
@@ -100,10 +101,10 @@ function TarFile(fileName, entries)
 		
 		return returnValues;
 	}
-	
-	TarFile.prototype.toBytes = function()
+
+	toBytes()
 	{
-		var fileAsBytes = [];		
+		var fileAsBytes = [];
 
 		// hack - For easier debugging.
 		var entriesAsByteArrays = [];
@@ -113,18 +114,18 @@ function TarFile(fileName, entries)
 			var entry = this.entries[i];
 			var entryAsBytes = entry.toBytes();
 			entriesAsByteArrays.push(entryAsBytes);
-		}		
-		
+		}
+
 		for (var i = 0; i < entriesAsByteArrays.length; i++)
 		{
 			var entryAsBytes = entriesAsByteArrays[i];
 			fileAsBytes = fileAsBytes.concat(entryAsBytes);
 		}
-		
-		var chunkSize = TarFile.ChunkSize;
-		
+
+		var chunkSize = TarFile.ChunkSize();
+
 		var numberOfZeroChunksToWrite = 2;
-		
+
 		for (var i = 0; i < numberOfZeroChunksToWrite; i++)
 		{
 			for (var b = 0; b < chunkSize; b++)
@@ -135,10 +136,10 @@ function TarFile(fileName, entries)
 
 		return fileAsBytes;
 	}
-	
+
 	// strings
 
-	TarFile.prototype.toString = function()
+	toString()
 	{
 		var newline = "\n";
 

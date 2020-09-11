@@ -1,0 +1,61 @@
+<html>
+<body>
+<script type="text/javascript">
+
+function main()
+{
+	var instanceOne = new FunctionOne();
+	var instanceTwo = new FunctionTwo();
+}
+
+function FunctionOne()
+{
+	this.valueOne = 1;
+	this.valueTwo = 2;
+}
+
+{
+	FunctionOne.staticOne = function()
+	{}
+
+	FunctionOne.prototype.methodOne = function()
+	{
+		// Do nothing.
+	}
+
+	FunctionOne.prototype.methodTwo = function()
+	{
+		var one = 1;
+		var two = 2;
+		return one + two;
+	}
+}
+
+function FunctionTwo()
+{
+	this.valueOne = 1;
+	this.valueTwo = 2;
+}
+
+{
+	FunctionTwo.staticOne = function()
+	{}
+
+	FunctionTwo.prototype.methodOne = function()
+	{
+		// Do nothing.
+	}
+
+	FunctionTwo.prototype.methodTwo = function()
+	{
+		var one = 1;
+		var two = 2;
+		return one + two;
+	}
+}
+
+main();
+
+</script>
+</body>
+</html>

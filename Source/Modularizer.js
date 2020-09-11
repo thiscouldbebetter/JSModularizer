@@ -1,21 +1,20 @@
 
-function Modularizer()
+class Modularizer
 {
-	// do nothing
-}
-{
-	// constants
-
-	Modularizer.LineFeed = "\n";
-	Modularizer.Newline = "\r\n";
-	Modularizer.TokenForEndOfFunction = "}";
-	Modularizer.TokenForStartOfFunction = "function ";
-	Modularizer.TokenForScriptTagOpen = "<script";
-	Modularizer.TokenForScriptTagClose = "</script";
+	constructor()
+	{
+		this.LineFeed = "\n";
+		this.Newline = "\r\n";
+		this.TokenForEndOfClassOrFunction = "}";
+		this.TokenForStartOfClass = "class ";
+		this.TokenForStartOfFunction = "function ";
+		this.TokenForScriptTagOpen = "<script";
+		this.TokenForScriptTagClose = "</script";
+	}
 
 	// methods
 
-	Modularizer.prototype.processFile = function(file)
+	processFile(file)
 	{
 		var fileType = file.type;
 		if (fileType == "application/x-tar")
@@ -32,12 +31,12 @@ function Modularizer()
 		}
 	}
 
-	Modularizer.prototype.demodularizeFile = function(file)
+	demodularizeFile(file)
 	{
 		var modularizer = this;
 
 		var fileReader = new FileReader();
-		fileReader.onload = function(event)
+		fileReader.onload = (event) =>
 		{
 			var tarFileAsBinaryString = event.target.result;
 			var tarFileAsBytes = [];
@@ -52,7 +51,7 @@ function Modularizer()
 		fileReader.readAsBinaryString(file, "UTF-8");
 	}
 
-	Modularizer.prototype.demodularizeTarFile = function(tarFile)
+	demodularizeTarFile(tarFile)
 	{
 		var bytesForAllEntriesSoFar = [];
 	
@@ -86,16 +85,16 @@ function Modularizer()
 
 		FileHelper.saveTextAsFile
 		(
-			bytesAsString, "Program.html"
+			bytesAsString, "Demodularized.html"
 		);
 	}
 
-	Modularizer.prototype.modularizeFile = function(file)
+	modularizeFile(file)
 	{
 		var modularizer = this;
 
 		var fileReader = new FileReader();
-		fileReader.onload = function(event)
+		fileReader.onload = (event) =>
 		{
 			var textFromFile = event.target.result;
 			modularizer.modularizeCode(textFromFile);
@@ -103,17 +102,17 @@ function Modularizer()
 		fileReader.readAsText(file, "UTF-8");
 	}
 
-	Modularizer.prototype.modularizeCode = function(textFromFile)
+	modularizeCode(textFromFile)
 	{
 		this.filesSoFar = [];
-		this.textForFileMaster = "";
+		this.textForFileMain = "";
 		this.nameOfFunction = null;
 		this.blocksForFunction = [];
 		this.textForBlockCurrent = "";
 
 		var textFromFileAsLines = textFromFile.split
 		(
-			Modularizer.LineFeed
+			this.LineFeed
 		);
 
 		var numberOfLines = textFromFileAsLines.length;
@@ -122,24 +121,34 @@ function Modularizer()
 		{
 			var lineFromFile = textFromFileAsLines[i];
 
-			if (lineFromFile.startsWith(Modularizer.TokenForScriptTagClose))
+			if (lineFromFile.startsWith(this.TokenForScriptTagClose))
 			{
+				for (var j = i; j < numberOfLines; j++)
+				{
+					var line = textFromFileAsLines[j];
+					this.textForBlockCurrent += line + this.Newline;
+				}
 				break;
 			}
-
-			if (lineFromFile.startsWith(Modularizer.TokenForStartOfFunction))
+			else if (lineFromFile.startsWith(this.TokenForStartOfClass))
 			{
-				this.processStartOfFunction(lineFromFile);
+				var isClassNotFunctionTrue = true;
+				this.processStartOfClassOrFunction(lineFromFile, isClassNotFunctionTrue);
+			}
+			else if (lineFromFile.startsWith(this.TokenForStartOfFunction))
+			{
+				var isClassNotFunctionFalse = false;
+				this.processStartOfClassOrFunction(lineFromFile, isClassNotFunctionFalse);
 			}
 
-			if (lineFromFile.startsWith(Modularizer.TokenForScriptTagOpen) == false)
+			if (lineFromFile.startsWith(this.TokenForScriptTagOpen) == false)
 			{
 				this.textForBlockCurrent += 
 					lineFromFile 
-					+ Modularizer.LineFeed;
+					+ this.LineFeed;
 			}
-			
-			if (lineFromFile.startsWith(Modularizer.TokenForEndOfFunction))
+
+			if (lineFromFile.startsWith(this.TokenForEndOfClassOrFunction))
 			{
 				this.blocksForFunction.push
 				(
@@ -161,14 +170,14 @@ function Modularizer()
 		);
 		this.filesSoFar.push(fileForFunction);
 
-		this.textForFileMaster += this.textForBlockCurrent;
-		var fileForMaster = new FileWrapper
+		this.textForFileMain += this.textForBlockCurrent;
+		var fileForMain = new FileWrapper
 		(
-			"_Master.html", false, this.textForFileMaster
+			"_Main.html", false, this.textForFileMain
 		);
-		this.filesSoFar.push(fileForMaster);
+		this.filesSoFar.push(fileForMain);
 
-		var tarFile = TarFile.new();
+		var tarFile = TarFile.create();
 
 		for (var i = 0; i < this.filesSoFar.length; i++)
 		{
@@ -193,15 +202,15 @@ function Modularizer()
 		FileHelper.saveBytesAsFile
 		(
 			tarFileAsBytes,
-			"Program.tar"
+			"Modularized.tar"
 		);
 	}
 
-	Modularizer.prototype.processStartOfFunction = function(lineFromFile)
+	processStartOfClassOrFunction(lineFromFile, isClassNotFunction)
 	{
 		if (this.nameOfFunction == null)
 		{
-			this.textForFileMaster += this.textForBlockCurrent;
+			this.textForFileMain += this.textForBlockCurrent;
 			this.textForBlockCurrent = "";
 		}
 		else if (this.textForBlockCurrent.length > 0)
@@ -210,9 +219,9 @@ function Modularizer()
 
 			var textForFileFunction = this.blocksForFunction.join
 			(
-				Modularizer.LineFeed
+				this.LineFeed
 			);
-			
+
 			var file = new FileWrapper
 			(
 				fileNameToSaveAs, false, textForFileFunction
@@ -221,26 +230,32 @@ function Modularizer()
 			this.filesSoFar.push(file);
 		}
 
-		var indexAtEndOfFunctionName = lineFromFile.indexOf("(");
-		if (indexAtEndOfFunctionName == -1)
+		var indexAtStartOfClassOrFunctionName =
+		(
+			isClassNotFunction
+			? this.TokenForStartOfClass.length
+			: this.TokenForStartOfFunction.length
+		);
+		var indexAtEndOfClassOrFunctionName = lineFromFile.indexOf("(");
+		if (indexAtEndOfClassOrFunctionName == -1)
 		{
-			indexAtEndOfFunctionName = lineFromFile.length - 1;
+			indexAtEndOfClassOrFunctionName = lineFromFile.length - 1;
 		}
-				
+
 		this.nameOfFunction = lineFromFile.substring
 		(
-			Modularizer.TokenForStartOfFunction.length,
-			indexAtEndOfFunctionName
+			indexAtStartOfClassOrFunctionName,
+			indexAtEndOfClassOrFunctionName
 		);
 
 		this.blocksForFunction = [];
 
-		this.textForFileMaster += 
+		this.textForFileMain +=
 			"<script type=\"text/javascript\" src=\"" 
 			+ this.nameOfFunction 
 			+ ".js\">"
 			+ "<" + "/script>" 
-			+ Modularizer.Newline;
+			+ this.Newline;
 
 		this.textForFileFunction = "";
 	}
