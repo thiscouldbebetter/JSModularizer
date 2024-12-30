@@ -12,22 +12,9 @@
 	<input
 		id="inputFileToLoad"
 		type="file"
-		onchange="inputFileToLoad_OnChange()"
+		onchange="UiEventHandler.inputFileToLoad_OnChange()"
 	></input>
 </div>
-
-<script type="text/javascript">
-
-	// user interface events
-
-	function inputFileToLoad_OnChange()
-	{
-		var inputFileToLoad = document.getElementById("inputFileToLoad");
-		var fileToLoad = inputFileToLoad.files[0];
-		new Modularizer().processFile(fileToLoad);
-	}
-
-</script>
 
 <script type="text/javascript" src="ByteHelper.js"></script>
 <script type="text/javascript" src="ByteStream.js"></script>
@@ -38,6 +25,7 @@
 <script type="text/javascript" src="TarFileEntry.js"></script>
 <script type="text/javascript" src="TarFileEntryHeader.js"></script>
 <script type="text/javascript" src="TarFileTypeFlag.js"></script>
+<script type="text/javascript" src="UiEventHandler.js"></script>
 
 </body>
 </html>
